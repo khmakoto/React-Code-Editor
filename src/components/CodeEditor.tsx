@@ -96,7 +96,7 @@ export class CodeEditor extends React.Component<CodeEditorProps, CodeEditorState
 
       let len = text.length;
       let spaces = '<pre style="display: inline">';
-      for (let j = 0; j < len - 1; j++) {
+      for (let j = 0; j < len; j++) {
         if (text[j] === ' ') {
           spaces += ' ';
         } else {
@@ -111,10 +111,6 @@ export class CodeEditor extends React.Component<CodeEditorProps, CodeEditorState
       len = wordArray.length;
       for (let j = 0; j < len - 1; j++) {
         let word = wordArray[j];
-
-        if (word.length === 0) {
-          continue;
-        }
 
         let semicolon = false;
         if (word[word.length - 1] === ';' && word.substr(word.length - 4) !== '&lt;' && word.substr(word.length - 4) !== '&gt;') {
@@ -189,10 +185,23 @@ export class CodeEditor extends React.Component<CodeEditorProps, CodeEditorState
     }
   };
 
+  private _onKeyDown = (ev: React.KeyboardEvent<HTMLDivElement>) => {
+    // If a tab was pressed
+    if (ev.keyCode === 9) {
+      ev.preventDefault();
+    }
+  };
+
   render() {
     return (
       <div>
-        <ContentEditable style={this._editorStyles} innerRef={this._onEditorRef} html={this.state.innerHTML} onChange={this._onChange} />
+        <ContentEditable
+          style={this._editorStyles}
+          innerRef={this._onEditorRef}
+          html={this.state.innerHTML}
+          onChange={this._onChange}
+          onKeyDown={this._onKeyDown}
+        />
         <div ref={this._onViewRef} style={this._viewStyles}>
           // Start writing code here...
         </div>
