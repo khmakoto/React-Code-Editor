@@ -1,6 +1,7 @@
 import * as React from 'react';
 import ContentEditable from 'react-contenteditable';
 import { libraryWords, reservedWords, semiReservedWords } from '../common/constants';
+import './CodeEditor.css';
 
 export interface CodeEditorProps {
   onChange?: (ev: React.KeyboardEvent<HTMLDivElement>, childCount: number) => void;
@@ -80,24 +81,42 @@ export class CodeEditor extends React.Component<CodeEditorProps, CodeEditorState
 
     for (let i = 0; i < length; i++) {
       let text = divArray[i].innerHTML;
-      text = text.replace(/&nbsp;/g, '');
-      text = text.replace(/<span>/g, '');
-      text = text.replace(/<span style="color: #569CD6">/g, '');
-      text = text.replace(/<span style='color: #569CD6'>/g, '');
-      text = text.replace(/<span style="color: #C586C0">/g, '');
-      text = text.replace(/<span style='color: #C586C0'>/g, '');
-      text = text.replace(/<span style="color: #4EC9B0">/g, '');
-      text = text.replace(/<span style='color: #4EC9B0'>/g, '');
+      text = text.replace(/&nbsp;/g, ' ');
+      text = text.replace(/<span class="statement">/g, '');
+      text = text.replace(/<span class='statement'>/g, '');
+      text = text.replace(/<span class="statement reserved">/g, '');
+      text = text.replace(/<span class='statement reserved'>/g, '');
+      text = text.replace(/<span class="statement semiReserved">/g, '');
+      text = text.replace(/<span class='statement semiReserved'>/g, '');
+      text = text.replace(/<span class="statement library">/g, '');
+      text = text.replace(/<span class='statement library'>/g, '');
       text = text.replace(/<\/span>/g, '');
 
-      const wordArray = text.split(' ');
-
       let lineText = '';
-      const len = wordArray.length;
+
+      let len = text.length;
+      let spaces = '<pre style="display: inline">';
+      for (let j = 0; j < len - 1; j++) {
+        if (text[j] === ' ') {
+          spaces += ' ';
+        } else {
+          text = text.substr(j);
+          break;
+        }
+      }
+      spaces += '</pre>';
+      lineText += spaces;
+
+      const wordArray = text.split(' ');
+      len = wordArray.length;
       for (let j = 0; j < len - 1; j++) {
         let word = wordArray[j];
+
+        if (word.length === 0) {
+          continue;
+        }
+
         let semicolon = false;
-        console.log(word.substr(word.length - 4));
         if (word[word.length - 1] === ';' && word.substr(word.length - 4) !== '&lt;' && word.substr(word.length - 4) !== '&gt;') {
           word = word.substr(0, word.length - 1);
           semicolon = true;
@@ -105,23 +124,23 @@ export class CodeEditor extends React.Component<CodeEditorProps, CodeEditorState
 
         switch (this._getCategory(word) || this._getCategory(word + ' ')) {
           case 'reserved': {
-            lineText += '<span style="color: #569CD6">' + word;
+            lineText += '<span class="statement reserved">' + word;
             break;
           }
           case 'semiReserved': {
-            lineText += '<span style="color: #C586C0">' + word;
+            lineText += '<span class="statement semiReserved">' + word;
             break;
           }
           case 'library': {
-            lineText += '<span style="color: #4EC9B0">' + word;
+            lineText += '<span class="statement library">' + word;
             break;
           }
           default: {
-            lineText += '<span>' + word;
+            lineText += '<span class="statement">' + word;
           }
         }
 
-        lineText += semicolon ? '</span><span>; </span>' : ' </span>';
+        lineText += semicolon ? '</span><span class="statement">; </span>' : ' </span>';
       }
 
       let word = wordArray[len - 1];
@@ -132,23 +151,24 @@ export class CodeEditor extends React.Component<CodeEditorProps, CodeEditorState
       }
       switch (this._getCategory(word) || this._getCategory(word + ' ')) {
         case 'reserved': {
-          lineText += '<span style="color: #569CD6">' + word;
+          lineText += '<span class="statement reserved">' + word;
           break;
         }
         case 'semiReserved': {
-          lineText += '<span style="color: #C586C0">' + word;
+          lineText += '<span class="statement semiReserved">' + word;
           break;
         }
         case 'library': {
-          lineText += '<span style="color: #4EC9B0">' + word;
+          lineText += '<span class="statement library">' + word;
           break;
         }
         default: {
-          lineText += '<span>' + word;
+          lineText += '<span class="statement">' + word;
         }
       }
-      lineText += semicolon ? '</span><span>;</span>' : '</span>';
+      lineText += semicolon ? '</span><span class="statement">;</span>' : '</span>';
 
+      console.log(lineText);
       innerText += '<div>' + lineText + '</div>';
     }
 

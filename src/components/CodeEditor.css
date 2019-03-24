@@ -1,0 +1,15 @@
+.statement {
+  white-space: pre;
+}
+
+.reserved {
+  color: #569cd6;
+}
+
+.semiReserved {
+  color: #c586c0;
+}
+
+.library {
+  color: #4ec9b0;
+}
