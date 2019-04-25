@@ -1,5 +1,6 @@
 import * as React from 'react';
 import ContentEditable from 'react-contenteditable';
+import $ from 'jquery';
 import { libraryWords, reservedWords, semiReservedWords } from '../common/constants';
 import './CodeEditor.css';
 
@@ -49,7 +50,8 @@ export class CodeEditor extends React.Component<CodeEditorProps, CodeEditorState
       color: 'transparent',
       height: 'calc(100% - 10px)',
       left: '40px',
-      position: 'absolute'
+      position: 'absolute',
+      whiteSpace: 'pre'
     }
   };
 
@@ -164,7 +166,7 @@ export class CodeEditor extends React.Component<CodeEditorProps, CodeEditorState
       }
       lineText += semicolon ? '</span><span class="statement">;</span>' : '</span>';
 
-      console.log(lineText);
+      // console.log(lineText);
       innerText += '<div>' + lineText + '</div>';
     }
 
@@ -189,6 +191,41 @@ export class CodeEditor extends React.Component<CodeEditorProps, CodeEditorState
     // If a tab was pressed
     if (ev.keyCode === 9) {
       ev.preventDefault();
+
+      // Insert spaces at caret position.
+      if (window.getSelection) {
+        const selection = window.getSelection();
+        if (selection && selection.getRangeAt && selection.rangeCount) {
+          let range = selection.getRangeAt(0);
+          range.deleteContents();
+
+          let element = document.createElement('span');
+          element.className = 'statement';
+          element.innerHTML = '  ';
+
+          let frag = document.createDocumentFragment();
+          let node;
+          let lastNode;
+
+          while ((node = element.firstChild)) {
+            lastNode = frag.appendChild(node);
+          }
+          range.insertNode(frag);
+
+          // Preserve the selection
+          if (lastNode) {
+            range = range.cloneRange();
+            range.setStartAfter(lastNode);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+        }
+      }
+
+      if (this._editor) {
+        this._colorWords(this._editor.children);
+      }
     }
   };
 
