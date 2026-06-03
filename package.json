@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.16",
     "@types/react-dom": "^19.2.3",
-    "react": "^19.2.6",
+    "react": "^19.2.7",
     "react-contenteditable": "^3.3.7",
     "react-dom": "^19.2.6",
     "react-scripts": "5.0.1",
